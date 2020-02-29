@@ -1,7 +1,28 @@
 'use strict';
 
 //key: タスクの文字列、　value: 完了しているかどうかの真偽値
-const tasks = new Map();
+let tasks = new Map();
+
+const fs = require('fs');
+const fileName = './tasks.json';
+
+try 
+{
+  const dataString = fs.readFileSync(fileName, 'utf8');
+  tasks = new Map(JSON.parse(dataString));
+}
+catch(err)
+{
+  console.log(`${fileName}から復元できませんでした`);
+}
+
+/**
+ * タスクをファイルに保存する
+ */
+function saveTasks() 
+{
+  fs.writeFileSync(fileName, JSON.stringify(Array.from(tasks)), 'utf8');
+}
 
 /**
  * タスクを追加する（未完了）
@@ -10,6 +31,7 @@ const tasks = new Map();
 function todo(task) 
 {
     tasks.set(task, false);
+    saveTasks();
 }
 
 //タスクが完了している場合
@@ -40,6 +62,7 @@ function list()
 function done(task) {
     if (tasks.has(task)) {
       tasks.set(task, true);
+      saveTasks();
     }
   }
   
@@ -52,6 +75,7 @@ function donelist() {
 
 function del(task){
   tasks.delete(task);
+  saveTasks();
 }
 
 module.exports = {
